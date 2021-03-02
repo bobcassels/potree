@@ -118,12 +118,11 @@ function lasLazAttributes(fMno){
 
 export class POCLoader {
 
-	static load(url, callback){
+        static load(url, urlSigner, callback){
 		try {
-			let pco = new PointCloudOctreeGeometry();
-			pco.url = url;
+		        let pco = new PointCloudOctreeGeometry(url, urlSigner);
 			let xhr = XHRFactory.createXMLHttpRequest();
-			xhr.open('GET', url, true);
+		        xhr.open('GET', urlSigner(url), true);
 
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {
@@ -135,7 +134,8 @@ export class POCLoader {
 					if (fMno.octreeDir.indexOf('http') === 0) {
 						pco.octreeDir = fMno.octreeDir;
 					} else {
-						pco.octreeDir = url + '/../' + fMno.octreeDir;
+                                                const lastSlash = url.lastIndexOf('/');
+					        pco.octreeDir = url.substring(0, lastSlash + 1) + fMno.octreeDir;
 					}
 
 					pco.spacing = fMno.spacing;

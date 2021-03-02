@@ -7,8 +7,9 @@ import {OctreeGeometry, OctreeGeometryNode} from "./OctreeGeometry.js";
 
 export class NodeLoader{
 
-	constructor(url){
-		this.url = url;
+        constructor(url, urlSigner){
+                this.url = url;
+                this.urlSigner = urlSigner;
 	}
 
 	async load(node){
@@ -35,7 +36,8 @@ export class NodeLoader{
 			let {byteOffset, byteSize} = node;
 
 
-			let urlOctree = `${this.url}/../octree.bin`;
+                        const lastSlash = this.url.lastIndexOf('/');
+			const urlOctree = `${this.url.substring(0, lastSlash + 1)}octree.bin`;
 
 			let first = byteOffset;
 			let last = byteOffset + byteSize - 1n;
@@ -46,13 +48,9 @@ export class NodeLoader{
 				buffer = new ArrayBuffer(0);
 				console.warn(`loaded node with 0 bytes: ${node.name}`);
 			}else{
-				let response = await fetch(urlOctree, {
-					headers: {
-						'content-type': 'multipart/byteranges',
-						'Range': `bytes=${first}-${last}`,
-					},
-				});
-
+                                const headers = {Range: `bytes=${first}-${last}`};
+			        const response = await fetch(this.urlSigner(urlOctree, headers),
+                                                             {headers})
 				buffer = await response.arrayBuffer();
 			}
 
@@ -238,20 +236,14 @@ export class NodeLoader{
 	async loadHierarchy(node){
 
 		let {hierarchyByteOffset, hierarchyByteSize} = node;
-		let hierarchyPath = `${this.url}/../hierarchy.bin`;
-		
+                const lastSlash = this.url.lastIndexOf('/');
+		const hierarchyPath = `${this.url.substring(0, lastSlash + 1)}hierarchy.bin`;
 		let first = hierarchyByteOffset;
 		let last = first + hierarchyByteSize - 1n;
 
-		let response = await fetch(hierarchyPath, {
-			headers: {
-				'content-type': 'multipart/byteranges',
-				'Range': `bytes=${first}-${last}`,
-			},
-		});
-
-
-
+                const headers = {Range: `bytes=${first}-${last}`};
+                const response = await fetch(this.urlSigner(hierarchyPath, headers),
+                                             {headers})
 		let buffer = await response.arrayBuffer();
 
 		this.parseHierarchy(node, buffer);
@@ -377,14 +369,14 @@ export class OctreeLoader{
 		return attributes;
 	}
 
-	static async load(url){
+        static async load(url, urlSigner){
 
-		let response = await fetch(url);
+                let response = await fetch(urlSigner(url));
 		let metadata = await response.json();
 
 		let attributes = OctreeLoader.parseAttributes(metadata.attributes);
 
-		let loader = new NodeLoader(url);
+                let loader = new NodeLoader(url, urlSigner);
 		loader.metadata = metadata;
 		loader.attributes = attributes;
 		loader.scale = metadata.scale;

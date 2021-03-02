@@ -18,7 +18,7 @@ export class EptLaszipLoader {
 		let url = node.url() + '.laz';
 
 		let xhr = XHRFactory.createXMLHttpRequest();
-		xhr.open('GET', url, true);
+	        xhr.open('GET', node.signURL(url), true);
 		xhr.responseType = 'arraybuffer';
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 		xhr.onreadystatechange = () => {
