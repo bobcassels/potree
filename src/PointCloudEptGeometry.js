@@ -23,7 +23,7 @@ class U {
 };
 
 export class PointCloudEptGeometry {
-        constructor(url, urlSigner, info) {
+        constructor(url, signUrl, info) {
 		let version = info.version;
 		let schema = info.schema;
 		let bounds = info.bounds;
@@ -40,7 +40,7 @@ export class PointCloudEptGeometry {
 		this.eptOffset = U.toVector3(offset);
 
                 this.url = url;
-                this.urlSigner = urlSigner;
+                this.signUrl = signUrl;
 		this.info = info;
 		this.type = 'ept';
 
@@ -212,7 +212,7 @@ export class PointCloudEptGeometryNode extends PointCloudTreeNode {
 	getBoundingSphere() { return this.boundingSphere; }
 	getBoundingBox() { return this.boundingBox; }
 	url() { return this.ept.url + 'ept-data/' + this.filename(); }
-        signURL(url) { return this.ept.urlSigner(url); }
+        signURL(url) { return this.ept.signUrl(url); }
 	getNumPoints() { return this.numPoints; }
 
 	filename() { return this.key.name(); }
@@ -257,7 +257,7 @@ export class PointCloudEptGeometryNode extends PointCloudTreeNode {
 		let eptHierarchyFile =
 			`${this.ept.url}ept-hierarchy/${this.filename()}.json`;
 
-	        let response = await fetch(this.ept.urlSigner(eptHierarchyFile));
+	        let response = await fetch(this.ept.signUrl(eptHierarchyFile));
 		let hier = await response.json();
 
 		// Since we want to traverse top-down, and 10 comes

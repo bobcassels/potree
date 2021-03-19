@@ -118,11 +118,11 @@ function lasLazAttributes(fMno){
 
 export class POCLoader {
 
-        static load(url, urlSigner, callback){
+        static load(url, signUrl, callback){
 		try {
-		        let pco = new PointCloudOctreeGeometry(url, urlSigner);
+		        let pco = new PointCloudOctreeGeometry(url, signUrl);
 			let xhr = XHRFactory.createXMLHttpRequest();
-		        xhr.open('GET', urlSigner(url), true);
+		        xhr.open('GET', signUrl(url), true);
 
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {

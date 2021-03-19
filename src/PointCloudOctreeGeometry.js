@@ -7,9 +7,9 @@ import {Utils} from "./utils.js";
 
 export class PointCloudOctreeGeometry{
 
-        constructor(url, urlSigner){
+        constructor(url, signUrl){
 	        this.url = url;
-                this.urlSigner = urlSigner;
+                this.signUrl = signUrl;
 		this.octreeDir = null;
 		this.spacing = 0;
 		this.boundingBox = null;
@@ -98,7 +98,7 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 	}
 
         signURL(url){
-                return this.pcoGeometry.urlSigner(url);
+                return this.pcoGeometry.signUrl(url);
         }
 
 	getHierarchyPath(){
@@ -227,7 +227,7 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 			let hurl = node.pcoGeometry.octreeDir + '/' + node.getHierarchyPath() + '/' + node.name + '.hrc';
 
 			let xhr = XHRFactory.createXMLHttpRequest();
-		        xhr.open('GET', node.pcoGeometry.urlSigner(hurl), true);
+		        xhr.open('GET', node.pcoGeometry.signUrl(hurl), true);
 			xhr.responseType = 'arraybuffer';
 			xhr.overrideMimeType('text/plain; charset=x-user-defined');
 			xhr.onreadystatechange = () => {

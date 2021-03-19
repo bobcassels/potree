@@ -128,9 +128,9 @@ let resourcePath = scriptPath + '/resources';
 export {scriptPath, resourcePath};
 
 
-export function loadPointCloud(path, name, callback, urlSignerArg) {
-        // Default urlSigner to the identity function.
-        const urlSigner = urlSignerArg || function(x) {return x;};
+export function loadPointCloud(path, name, callback, signUrlArg) {
+        // Default signUrl to the identity function.
+        const signUrl = signUrlArg || function(x) {return x;};
 	let loaded = function(e){
 		e.pointcloud.name = name;
 		callback(e);
@@ -142,7 +142,7 @@ export function loadPointCloud(path, name, callback, urlSignerArg) {
 		if (!path){
 			// TODO: callback? comment? Hello? Bueller? Anyone?
 		} else if (path.indexOf('ept.json') > 0) {
-		        EptLoader.load(path, urlSigner, function(geometry) {
+		        EptLoader.load(path, signUrl, function(geometry) {
 				if (!geometry) {
 					console.error(new Error(`failed to load point cloud from URL: ${path}`));
 				}
@@ -154,7 +154,7 @@ export function loadPointCloud(path, name, callback, urlSignerArg) {
 			});
 		} else if (path.indexOf('cloud.js') > 0) {
 		        POCLoader.load(path,
-                                       urlSigner,
+                                       signUrl,
                                        function (geometry) {
 				         if (!geometry) {
 				           //callback({type: 'loading_failed'});
@@ -166,7 +166,7 @@ export function loadPointCloud(path, name, callback, urlSignerArg) {
 				         }
                                        });
 		} else if (path.indexOf('metadata.json') > 0) {
-		        OctreeLoader.load(path, urlSigner).then(e => {
+		        OctreeLoader.load(path, signUrl).then(e => {
 				let geometry = e.geometry;
 
 				if(!geometry){
@@ -187,7 +187,7 @@ export function loadPointCloud(path, name, callback, urlSignerArg) {
 				}
 			});
 		} else if (path.indexOf('.vpc') > 0) {
-		        PointCloudArena4DGeometry.load(path, urlSigner, function (geometry) {
+		        PointCloudArena4DGeometry.load(path, signUrl, function (geometry) {
 				if (!geometry) {
 					//callback({type: 'loading_failed'});
 					console.error(new Error(`failed to load point cloud from URL: ${path}`));

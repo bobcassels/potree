@@ -7,9 +7,9 @@ import {OctreeGeometry, OctreeGeometryNode} from "./OctreeGeometry.js";
 
 export class NodeLoader{
 
-        constructor(url, urlSigner){
+        constructor(url, signUrl){
                 this.url = url;
-                this.urlSigner = urlSigner;
+                this.signUrl = signUrl;
 	}
 
 	async load(node){
@@ -49,7 +49,7 @@ export class NodeLoader{
 				console.warn(`loaded node with 0 bytes: ${node.name}`);
 			}else{
                                 const headers = {Range: `bytes=${first}-${last}`};
-			        const response = await fetch(this.urlSigner(urlOctree, headers),
+			        const response = await fetch(this.signUrl(urlOctree, headers),
                                                              {headers})
 				buffer = await response.arrayBuffer();
 			}
@@ -242,7 +242,7 @@ export class NodeLoader{
 		let last = first + hierarchyByteSize - 1n;
 
                 const headers = {Range: `bytes=${first}-${last}`};
-                const response = await fetch(this.urlSigner(hierarchyPath, headers),
+                const response = await fetch(this.signUrl(hierarchyPath, headers),
                                              {headers})
 		let buffer = await response.arrayBuffer();
 
@@ -369,14 +369,14 @@ export class OctreeLoader{
 		return attributes;
 	}
 
-        static async load(url, urlSigner){
+        static async load(url, signUrl){
 
-                let response = await fetch(urlSigner(url));
+                let response = await fetch(signUrl(url));
 		let metadata = await response.json();
 
 		let attributes = OctreeLoader.parseAttributes(metadata.attributes);
 
-                let loader = new NodeLoader(url, urlSigner);
+                let loader = new NodeLoader(url, signUrl);
 		loader.metadata = metadata;
 		loader.attributes = attributes;
 		loader.scale = metadata.scale;
