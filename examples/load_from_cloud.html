@@ -31,7 +31,7 @@
 	<script src="../libs/plasio/js/laslaz.js"></script>
 	
 	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
-        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.853.0.min.js"></script>
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.868.0.min.js"></script>
 	<!-- INCLUDE SETTINGS HERE -->
 
         <div id="login-form">
@@ -113,18 +113,17 @@
             secretAccessKey: AWS_SECRET_ACCESS_KEY
           });
 
-          const urlConstructor =
-                // Note that for the V3 "modular" AWS API, this will need to be async
-                // But that requires significant changes to the loaders. (The loader for
-                // the 2.0 OctreeLoader is already async.)
-            (url, headers) => s3.getSignedUrl('getObject',
+          const signUrl =
+            // For AWS JavaScript API v2, this doesn't need to be async.
+            // But v3 and other cloud APIs will need async / await.
+            async (url, headers) => s3.getSignedUrl('getObject',
                                               {
                                                 Bucket: BUCKET,
-                                                Key: FOLDER + "/" + url,
+                                                Key: url,
                                                 ...(headers || {})
                                               });
 
-	    const e = await Potree.loadPointCloud(PATH, NAME, null, urlConstructor);
+	    const e = await Potree.loadPointCloud(FOLDER + '/' + PATH, NAME, null, signUrl);
 	    viewer.scene.addPointCloud(e.pointcloud);
 	    const material = e.pointcloud.material;
 	    material.size = 1;

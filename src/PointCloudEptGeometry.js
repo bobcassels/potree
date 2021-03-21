@@ -212,7 +212,7 @@ export class PointCloudEptGeometryNode extends PointCloudTreeNode {
 	getBoundingSphere() { return this.boundingSphere; }
 	getBoundingBox() { return this.boundingBox; }
 	url() { return this.ept.url + 'ept-data/' + this.filename(); }
-        signURL(url) { return this.ept.signUrl(url); }
+        signUrl(url) { return this.ept.signUrl(url); }
 	getNumPoints() { return this.numPoints; }
 
 	filename() { return this.key.name(); }
@@ -257,7 +257,7 @@ export class PointCloudEptGeometryNode extends PointCloudTreeNode {
 		let eptHierarchyFile =
 			`${this.ept.url}ept-hierarchy/${this.filename()}.json`;
 
-	        let response = await fetch(this.ept.signUrl(eptHierarchyFile));
+	        let response = await fetch(await this.ept.signUrl(eptHierarchyFile));
 		let hier = await response.json();
 
 		// Since we want to traverse top-down, and 10 comes

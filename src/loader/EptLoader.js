@@ -5,7 +5,7 @@
 export class EptLoader {
         static async load(file, signUrl, callback) {
 
-                let response = await fetch(signUrl(file));
+                let response = await fetch(await signUrl(file));
 		let json = await response.json();
 
 		let url = file.substr(0, file.lastIndexOf('ept.json'));
