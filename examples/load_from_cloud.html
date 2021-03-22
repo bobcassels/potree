@@ -118,7 +118,7 @@
 
           // azure
           const account = 'potreefiles';
-          const sas = '?sv=2020-02-10&ss=bfqt&srt=sco&sp=rwdlacupx&se=2022-03-20T02:37:50Z&st=2021-03-19T18:37:50Z&sip=73.142.35.254&spr=https&sig=5ej6PWKMGmlFDHyCWyr5CYWeu6bVkmYfF5wTRRPDmrk%3D';
+          const sas = '';
 
           var blobUri = 'https://' + account + '.blob.core.windows.net';
           var blobService = AzureStorage.Blob.createBlobServiceWithSas(blobUri, sas);
@@ -134,14 +134,17 @@
               }
           });
 
-          const signUrlAzure =
+
+       function getAzureSignedUrl() {
+              return "";
+       }
+
+       const signUrlAzure =
                 // Note that for the V3 "modular" AWS API, this will need to be async
                 // But that requires significant changes to the loaders. (The loader for
                 // the 2.0 OctreeLoader is already async.)
-            (url, headers) => blobService.getUrl('potreecontainer', 'cloud.js', sas);
+            async (url, headers) => getAzureSignedUrl();
 
-              console.log("azure url", signUrlAzure);
-              console.log("type of azure url", typeof(signUrlAzure));
 
           const signUrl =
             // For AWS JavaScript API v2, this doesn't need to be async.
@@ -153,7 +156,7 @@
                                                 ...(headers || {})
                                               });
 
-	    const e = await Potree.loadPointCloud(FOLDER + '/' + PATH, NAME, null, signUrl);
+	    const e = await Potree.loadPointCloud(FOLDER + "/" + PATH, NAME, null, signUrl);
 	    viewer.scene.addPointCloud(e.pointcloud);
 	    const material = e.pointcloud.material;
 	    material.size = 1;
