@@ -18,8 +18,8 @@
 	<script src="../libs/jquery/jquery-3.1.1.min.js"></script>
 	<script src="../libs/spectrum/spectrum.js"></script>
 	<script src="../libs/jquery-ui/jquery-ui.min.js"></script>
-	
-	
+
+
 	<script src="../libs/other/BinaryHeap.js"></script>
 	<script src="../libs/tween/tween.min.js"></script>
 	<script src="../libs/d3/d3.js"></script>
@@ -29,10 +29,13 @@
 	<script src="../libs/jstree/jstree.js"></script>
 	<script src="../build/potree/potree.js"></script>
 	<script src="../libs/plasio/js/laslaz.js"></script>
-	
+
 	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
         <script src="https://sdk.amazonaws.com/js/aws-sdk-2.868.0.min.js"></script>
 	<!-- INCLUDE SETTINGS HERE -->
+       <script src="azure-storage.blob.js"></script>
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+       <script src="https://apis.google.com/js/client.js"></script>
 
         <div id="login-form">
           <label for="name">Name</label>
@@ -78,7 +81,7 @@
 		<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
 		<div id="potree_sidebar_container"> </div>
 	</div>
-	
+
 	<script type="module">
 
 	import * as THREE from "../libs/three.js/build/three.module.js";
@@ -93,14 +96,14 @@
                 document.getElementById("login-form").style.display = "none";
                 document.getElementById("potree-container").style.display = "initial";
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-		
+
 		viewer.setEDLEnabled(true);
 		viewer.setFOV(60);
 		viewer.setPointBudget(1_000_000);
 		viewer.loadSettingsFromURL();
-		
+
 		viewer.setDescription("");
-		
+
 		viewer.loadGUI(() => {
 			viewer.setLanguage('en');
 			$("#menu_appearance").next().show();
@@ -112,6 +115,33 @@
             accessKeyId: AWS_ACCESS_KEY_ID,
             secretAccessKey: AWS_SECRET_ACCESS_KEY
           });
+
+          // azure
+          const account = 'potreefiles';
+          const sas = '?sv=2020-02-10&ss=bfqt&srt=sco&sp=rwdlacupx&se=2022-03-20T02:37:50Z&st=2021-03-19T18:37:50Z&sip=73.142.35.254&spr=https&sig=5ej6PWKMGmlFDHyCWyr5CYWeu6bVkmYfF5wTRRPDmrk%3D';
+
+          var blobUri = 'https://' + account + '.blob.core.windows.net';
+          var blobService = AzureStorage.Blob.createBlobServiceWithSas(blobUri, sas);
+          blobService.listBlobsSegmented('potreecontainer', null, function (error, results) {
+              if (error) {
+                     // List blobs error
+                     alert("error");
+              } else {
+                     for (var i = 0, blob; blob = results.entries[i]; i++) {
+                            // Deal with blob object
+                            //console.log(blob);
+                     }
+              }
+          });
+
+          const signUrlAzure =
+                // Note that for the V3 "modular" AWS API, this will need to be async
+                // But that requires significant changes to the loaders. (The loader for
+                // the 2.0 OctreeLoader is already async.)
+            (url, headers) => blobService.getUrl('potreecontainer', 'cloud.js', sas);
+
+              console.log("azure url", signUrlAzure);
+              console.log("type of azure url", typeof(signUrlAzure));
 
           const signUrl =
             // For AWS JavaScript API v2, this doesn't need to be async.
@@ -136,6 +166,101 @@
           button.addEventListener('click', runExample)
 
 	</script>
+
+
+<!-- TODO: Getting weird cookie error with chrome -->
+<!--Add buttons to initiate auth sequence and sign out-->
+<!-- <button id="authorize-button" style="display: none;">Authorize</button>
+<button id="signout-button" style="display: none;">Sign Out</button>
+
+<div id="content"></div>
+
+<script type="text/javascript">
+  // Enter an API key from the Google API Console:
+  //   https://console.developers.google.com/apis/credentials
+  var apiKey = 'AIzaSyANngPK5QvzXD54C4aSbRQhsFUUgAjV3KM';
+
+  // Enter the API Discovery Docs that describes the APIs you want to
+  // access. In this example, we are accessing the People API, so we load
+  // Discovery Doc found here: https://developers.google.com/people/api/rest/
+  //var discoveryDocs = ["https://storage.googleapis.com/storage/v1"];
+
+  var discoveryDocs = ["https://people.googleapis.com/$discovery/rest?version=v1"];
+
+
+  // Enter a client ID for a web application from the Google API Console:
+  //   https://console.developers.google.com/apis/credentials?project=_
+  // In your API Console project, add a JavaScript origin that corresponds
+  //   to the domain where you will be running the script.
+  var clientId = '895913023953-70d9ocaraennqmbst6gg2a5eu26pftor.apps.googleusercontent.com';
+
+  // Enter one or more authorization scopes. Refer to the documentation for
+  // the API or https://developers.google.com/people/v1/how-tos/authorizing
+  // for details.
+  var scopes = 'profile';
+
+  var authorizeButton = document.getElementById('authorize-button');
+  var signoutButton = document.getElementById('signout-button');
+
+  function handleClientLoad() {
+    // Load the API client and auth2 library
+    gapi.load('client:auth2', initClient);
+  }
+
+  function initClient() {
+    gapi.client.init({
+        apiKey: apiKey,
+        //discoveryDocs: discoveryDocs,
+        clientId: clientId,
+        scope: scopes
+    }).then(function () {
+      // Listen for sign-in state changes.
+      gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+      // Handle the initial sign-in state.
+      updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+
+      authorizeButton.onclick = handleAuthClick;
+      signoutButton.onclick = handleSignoutClick;
+    });
+  }
+
+  function updateSigninStatus(isSignedIn) {
+    if (isSignedIn) {
+      authorizeButton.style.display = 'none';
+      signoutButton.style.display = 'block';
+      makeApiCall();
+    } else {
+      authorizeButton.style.display = 'block';
+      signoutButton.style.display = 'none';
+    }
+  }
+
+  function handleAuthClick(event) {
+    gapi.auth2.getAuthInstance().signIn();
+  }
+
+  function handleSignoutClick(event) {
+    gapi.auth2.getAuthInstance().signOut();
+  }
+
+  // Load the API and make an API call.  Display the results on the screen.
+  function makeApiCall() {
+    gapi.client.people.people.get({
+      'resourceName': 'people/me',
+      'requestMask.includeField': 'person.names'
+    }).then(function(resp) {
+      var p = document.createElement('p');
+      var name = resp.result.names[0].givenName;
+      p.appendChild(document.createTextNode('Hello, '+name+'!'));
+      document.getElementById('content').appendChild(p);
+    });
+  }
+</script>
+<script async defer src="https://apis.google.com/js/api.js"
+  onload="this.onload=function(){};handleClientLoad()"
+  onreadystatechange="if (this.readyState === 'complete') this.onload()">
+</script> -->
 
   </body>
 </html>
