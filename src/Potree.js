@@ -128,6 +128,41 @@ let resourcePath = scriptPath + '/resources';
 export {scriptPath, resourcePath};
 
 
+// Look for PotreeConverter 2.0 format first, then older format.
+export async function loadPotreeConverterPointCloud(path, name, signUrlArg) {
+        const signUrl = signUrlArg || function(x) {return x;};
+        const e = await OctreeLoader.load(path + '/metadata.json', signUrl);
+        const geometry = e.geometry;
+        if (geometry) {
+                let pointcloud = new PointCloudOctree(geometry);
+
+                let aPosition = pointcloud.getAttribute("position");
+
+                let material = pointcloud.material;
+                material.elevationRange = [
+                        aPosition.range[0][2],
+                        aPosition.range[1][2],
+                ];
+
+                pointcloud.name = name;
+                return {type: 'pointcloud_loaded', pointcloud: pointcloud};
+        } else {
+          return new Promise( resolve => {
+                POCLoader.load(path + '/cloud.js',
+                               signUrl,
+                               function (geometry) {
+                                       if (!geometry) {
+                                               console.error(new Error(`failed to load point cloud from URL: ${path}`));
+                                       } else {
+                                               let pointcloud = new PointCloudOctree(geometry);
+                                               pointcloud.name = name;
+                                               resolve({type: 'pointcloud_loaded', pointcloud: pointcloud});
+                                       }
+                               });
+          });
+        }
+};
+
 export function loadPointCloud(path, name, callback, signUrlArg) {
         // Default signUrl to the identity function.
         const signUrl = signUrlArg || function(x) {return x;};

@@ -370,8 +370,14 @@ export class OctreeLoader{
 	}
 
         static async load(url, signUrl){
-
-                let response = await fetch(await signUrl(url));
+                const response = await fetch(await signUrl(url));
+                if (!response.ok) {
+                    // AWS "file not found" with signed URL returns 403
+                    if ([403, 404].includes(response.status)) {
+                            return {};
+                    }
+                    throw new Error(`Fetch error type: ${response.type}, status: ${response.status} ${response.statusText}`);
+                }
 		let metadata = await response.json();
 
 		let attributes = OctreeLoader.parseAttributes(metadata.attributes);
@@ -424,8 +430,7 @@ export class OctreeLoader{
 			geometry: octree,
 		};
 
-		return result;
-
+	        return result;
 	}
 
 };
