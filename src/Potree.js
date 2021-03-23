@@ -131,8 +131,7 @@ export {scriptPath, resourcePath};
 // Look for PotreeConverter 2.0 format first, then older format.
 export async function loadPotreeConverterPointCloud(path, name, signUrlArg) {
         const signUrl = signUrlArg || function(x) {return x;};
-        const e = await OctreeLoader.load(path + '/metadata.json', signUrl);
-        const geometry = e.geometry;
+        const {geometry} = await OctreeLoader.load(path + '/metadata.json', signUrl);
         if (geometry) {
                 let pointcloud = new PointCloudOctree(geometry);
 
