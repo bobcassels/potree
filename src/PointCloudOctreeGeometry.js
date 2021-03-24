@@ -19,7 +19,7 @@ export class PointCloudOctreeGeometry{
 		this.hierarchyStepSize = -1;
 		this.loader = null;
 	}
-	
+
 }
 
 export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
@@ -260,7 +260,7 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 			this.loaded = false;
 
 			this.dispatchEvent( { type: 'dispose' } );
-			
+
 			for (let i = 0; i < this.oneTimeDisposeHandlers.length; i++) {
 				let handler = this.oneTimeDisposeHandlers[i];
 				handler();
@@ -268,7 +268,7 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 			this.oneTimeDisposeHandlers = [];
 		}
 	}
-	
+
 }
 
 PointCloudOctreeGeometryNode.IDCount = 0;
