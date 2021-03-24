@@ -34,8 +34,9 @@
         <script src="https://sdk.amazonaws.com/js/aws-sdk-2.868.0.min.js"></script>
 	<!-- INCLUDE SETTINGS HERE -->
        <script src="azure-storage.blob.js"></script>
-       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
        <script src="https://apis.google.com/js/client.js"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 
         <div id="login-form">
           <label for="name">Name</label>
@@ -74,7 +75,23 @@
           <input type="password" size=40
                  placeholder="AWS_SECRET_ACCESS_KEY" name="psw" id="secret" required>
           <br/>
-          <button type="submit" id="start-button">Start</button>
+          <button type="submit" id="aws-start-button">Start</button>
+        </div>
+
+        <br/><br/>
+          <b>Microsoft Azure</b>
+          <br/>
+          <label for="container">Container</label>
+          <input type="text" size=20
+                 placeholder="CONTAINER"
+                 name="container" id="container" required>
+          <br/>
+          <label for="azure_secret_key">Azure Secret Key</label>
+          <input type="password" size=20
+                 placeholder="AZURE_SECRET_KEY"
+                 name="azure_secret_key" id="azure_secret" required>
+          <br/>
+          <button type="submit" id="azure-start-button">Start</button>
         </div>
 
         <div id="potree-container" class="potree_container" style="display: none; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
@@ -85,90 +102,138 @@
 	<script type="module">
 
 	import * as THREE from "../libs/three.js/build/three.module.js";
-          async function runExample() {
-                const NAME = document.getElementById("name").value;
-                const PATH = document.getElementById("path").value;
-                const REGION = document.getElementById("region").value;
-                const BUCKET = document.getElementById("bucket").value;
-                const FOLDER = document.getElementById("folder").value;
-                const AWS_ACCESS_KEY_ID = document.getElementById("key").value;
-                const AWS_SECRET_ACCESS_KEY = document.getElementById("secret").value;
-                document.getElementById("login-form").style.display = "none";
-                document.getElementById("potree-container").style.display = "initial";
-		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+  async function runAWSExample() {
+        const NAME = document.getElementById("name").value;
+        const PATH = document.getElementById("path").value;
+        const REGION = document.getElementById("region").value;
+        const BUCKET = document.getElementById("bucket").value;
+        const FOLDER = document.getElementById("folder").value;
+        const AWS_ACCESS_KEY_ID = document.getElementById("key").value;
+        const AWS_SECRET_ACCESS_KEY = document.getElementById("secret").value;
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("potree-container").style.display = "initial";
+    		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-		viewer.setEDLEnabled(true);
-		viewer.setFOV(60);
-		viewer.setPointBudget(1_000_000);
-		viewer.loadSettingsFromURL();
+    		viewer.setEDLEnabled(true);
+    		viewer.setFOV(60);
+    		viewer.setPointBudget(1_000_000);
+    		viewer.loadSettingsFromURL();
 
-		viewer.setDescription("");
+    		viewer.setDescription("");
 
-		viewer.loadGUI(() => {
-			viewer.setLanguage('en');
-			$("#menu_appearance").next().show();
-			//viewer.toggleSidebar();
-		});
+    		viewer.loadGUI(() => {
+    			viewer.setLanguage('en');
+    			$("#menu_appearance").next().show();
+    			//viewer.toggleSidebar();
+    		});
 
-          const s3 = new AWS.S3({
-            region: REGION,
-            accessKeyId: AWS_ACCESS_KEY_ID,
-            secretAccessKey: AWS_SECRET_ACCESS_KEY
-          });
+        const s3 = new AWS.S3({
+          region: REGION,
+          accessKeyId: AWS_ACCESS_KEY_ID,
+          secretAccessKey: AWS_SECRET_ACCESS_KEY
+        });
 
-          // azure
-          const account = 'potreefiles';
-          const sas = '';
+        const signUrl =
+          // For AWS JavaScript API v2, this doesn't need to be async.
+          // But v3 and other cloud APIs will need async / await.
+           async (url, headers) => s3.getSignedUrl('getObject',
+                                            {
+                                              Bucket: BUCKET,
+                                              Key: url,
+                                              ...(headers || {})
+                                            });
 
-          var blobUri = 'https://' + account + '.blob.core.windows.net';
-          var blobService = AzureStorage.Blob.createBlobServiceWithSas(blobUri, sas);
-          blobService.listBlobsSegmented('potreecontainer', null, function (error, results) {
-              if (error) {
-                     // List blobs error
-                     alert("error");
-              } else {
-                     for (var i = 0, blob; blob = results.entries[i]; i++) {
-                            // Deal with blob object
-                            //console.log(blob);
-                     }
-              }
-          });
+    	    const e = await Potree.loadPointCloud(FOLDER + "/" + PATH, NAME, null, signUrl);
+    	    viewer.scene.addPointCloud(e.pointcloud);
+    	    const material = e.pointcloud.material;
+    	    material.size = 1;
+    	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 
-
-       function getAzureSignedUrl() {
-              return "";
+    	    viewer.fitToScreen();
        }
 
-       const signUrlAzure =
-                // Note that for the V3 "modular" AWS API, this will need to be async
-                // But that requires significant changes to the loaders. (The loader for
-                // the 2.0 OctreeLoader is already async.)
-            async (url, headers) => getAzureSignedUrl();
+    const awsButton = document.getElementById("aws-start-button");
+    awsButton.addEventListener('click', runAWSExample)
 
 
-          const signUrl =
-            // For AWS JavaScript API v2, this doesn't need to be async.
-            // But v3 and other cloud APIs will need async / await.
-            async (url, headers) => s3.getSignedUrl('getObject',
-                                              {
-                                                Bucket: BUCKET,
-                                                Key: url,
-                                                ...(headers || {})
-                                              });
 
-	    const e = await Potree.loadPointCloud(FOLDER + "/" + PATH, NAME, null, signUrl);
-	    viewer.scene.addPointCloud(e.pointcloud);
-	    const material = e.pointcloud.material;
-	    material.size = 1;
-	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+  function getAzureSignedUrl(url, azureKey) {
 
-	    viewer.fitToScreen();
-          }
+    const accountName = "potreefiles";
+    const key= azureKey;
+    const start = new Date(new Date().getTime() - (15 * 60 * 1000));
+    const end = new Date(new Date().getTime() + (1000 * 60 * 60 * 12)); // accessible for 12 hours
+    const signedpermissions = 'rl';
+    const signedservice = 'b';
+    const signedresourcetype = 'sco';
+    const signedexpiry = end.toISOString().substring(0, end.toISOString().lastIndexOf('.')) + 'Z';
+    const signedProtocol = 'https';
+    const signedversion = '2020-02-10';
 
-          const button = document.getElementById("start-button");
-          button.addEventListener('click', runExample)
+    const StringToSign =
+        accountName+ '\n' +
+        signedpermissions + '\n' +
+        signedservice + '\n' +
+        signedresourcetype + '\n' +
+         '\n' +
+        signedexpiry + '\n' +
+         '\n' +
+        signedProtocol + '\n' +
+        signedversion + '\n';
 
-	</script>
+    var str =CryptoJS.HmacSHA256(StringToSign,CryptoJS.enc.Base64.parse(key));
+    var sig = CryptoJS.enc.Base64.stringify(str);
+
+    const sasToken =`sv=${(signedversion)}&ss=${(signedservice)}&srt=${(signedresourcetype)}&sp=${(signedpermissions)}&se=${encodeURIComponent(signedexpiry)}&spr=${(signedProtocol)}&sig=${encodeURIComponent(sig)}`;
+
+     const urlToModifyStart = "https://potreefiles.blob.core.windows.net/";
+     const urlToModifyEnd = "?".concat(sasToken);
+     const pathToAdd = url;
+     const azureSas = urlToModifyStart.concat(pathToAdd).concat(urlToModifyEnd);
+
+     return azureSas;
+  }
+
+
+  async function runAZureExample() {
+        const NAME = document.getElementById("name").value;
+        const PATH = document.getElementById("path").value
+        const CONTAINER = document.getElementById("container").value;
+        const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("potree-container").style.display = "initial";
+    		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+
+    		viewer.setEDLEnabled(true);
+    		viewer.setFOV(60);
+    		viewer.setPointBudget(1_000_000);
+    		viewer.loadSettingsFromURL();
+
+    		viewer.setDescription("");
+
+    		viewer.loadGUI(() => {
+    			viewer.setLanguage('en');
+    			$("#menu_appearance").next().show();
+    			//viewer.toggleSidebar();
+    		});
+
+        const signUrlAzure =
+            async (url, headers) => getAzureSignedUrl(url, AZURE_SECRET_KEY);
+
+        const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
+  	    viewer.scene.addPointCloud(e.pointcloud);
+  	    const material = e.pointcloud.material;
+  	    material.size = 1;
+  	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+  	    viewer.fitToScreen();
+    }
+
+  const azureButton = document.getElementById("azure-start-button");
+  azureButton.addEventListener('click', runAZureExample)
+
+
+</script>
 
 
 <!-- TODO: Getting weird cookie error with chrome -->
