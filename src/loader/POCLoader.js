@@ -30,7 +30,7 @@ function parseAttributes(cloudjs){
 
 	const pointAttributes = [];
 	if(version.upTo('1.7')){
-		
+
 		for(let attributeName of cloudjs.pointAttributes){
 			const oldAttribute = PointAttribute[attributeName];
 
@@ -80,7 +80,7 @@ function parseAttributes(cloudjs){
 
 		{
 			// check if it has normals
-			let hasNormals = 
+			let hasNormals =
 				pointAttributes.find(a => a.name === "NormalX") !== undefined &&
 				pointAttributes.find(a => a.name === "NormalY") !== undefined &&
 				pointAttributes.find(a => a.name === "NormalZ") !== undefined;
@@ -120,9 +120,9 @@ export class POCLoader {
 
         static async load(url, signUrl, callback){
 		try {
-		        let pco = new PointCloudOctreeGeometry(url, signUrl);
+			let pco = new PointCloudOctreeGeometry(url, signUrl);
 			let xhr = XHRFactory.createXMLHttpRequest();
-		        xhr.open('GET', await signUrl(url), true);
+		    xhr.open('GET', await signUrl(url), true);
 
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState === 4 && (xhr.status === 200 || xhr.status === 0)) {
