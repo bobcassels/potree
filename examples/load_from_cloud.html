@@ -186,7 +186,7 @@
 
     const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
 
-     const urlToModifyStart = "https://potreefiles.blob.core.windows.net/";
+     const urlToModifyStart = `${signedProtocol}://${accountName}.blob.core.windows.net/`;
      const urlToModifyEnd = "?".concat(sasToken);
      const pathToAdd = url;
      const azureSas = urlToModifyStart.concat(pathToAdd).concat(urlToModifyEnd);
