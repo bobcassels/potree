@@ -80,13 +80,18 @@
         <br/><br/>
           <b>Microsoft Azure</b>
           <br/>
+          <label for="account_name">Account Name</label>
+          <input type="text" size=20
+                 placeholder="ACCOUNT_NAME"
+                 name="azure_account_name" id="azure_account_name" required>
+          <br/>
           <label for="container">Container</label>
           <input type="text" size=20
                  placeholder="CONTAINER"
                  name="container" id="container" required>
           <br/>
           <label for="azure_secret_key">Azure Secret Key</label>
-          <input type="password" size=20
+          <input type="password" size=40
                  placeholder="AZURE_SECRET_KEY"
                  name="azure_secret_key" id="azure_secret" required>
           <br/>
@@ -155,10 +160,7 @@
 
 
 
-  function getAzureSignedUrl(url, azureKey) {
-
-    const accountName = "potreefiles";
-    const key= azureKey;
+  function getAzureSignedUrl(url, accountName, azureKey) {
     const start = new Date(new Date().getTime() - (15 * 60 * 1000));
     const end = new Date(new Date().getTime() + (1000 * 60 * 60 * 12)); // accessible for 12 hours
     const signedpermissions = 'rl';
@@ -179,7 +181,7 @@
         signedProtocol + '\n' +
         signedversion + '\n';
 
-    const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(key));
+    const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(azureKey));
     const sig = CryptoJS.enc.Base64.stringify(signedString);
 
     const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
@@ -196,6 +198,7 @@
   async function runAZureExample() {
         const NAME = document.getElementById("name").value;
         const PATH = document.getElementById("path").value
+        const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
         const CONTAINER = document.getElementById("container").value;
         const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
         document.getElementById("login-form").style.display = "none";
@@ -216,7 +219,7 @@
     		});
 
         const signUrlAzure =
-            async (url, headers) => getAzureSignedUrl(url, AZURE_SECRET_KEY);
+            async (url, headers) => getAzureSignedUrl(url, ACCOUNT_NAME, AZURE_SECRET_KEY);
 
         const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
   	    viewer.scene.addPointCloud(e.pointcloud);
