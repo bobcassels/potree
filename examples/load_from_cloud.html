@@ -161,8 +161,7 @@
 
 
   function getAzureSignedUrl(url, accountName, azureKey) {
-    const start = new Date(new Date().getTime() - (15 * 60 * 1000));
-    const end = new Date(new Date().getTime() + (1000 * 60 * 60 * 12)); // accessible for 12 hours
+    const end = new Date(Date.now() + (1000 * 60 * 60 * 12)); // accessible for 12 hours
     const signedpermissions = 'rl';
     const signedservice = 'b';
     const signedresourcetype = 'sco';
