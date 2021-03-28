@@ -170,8 +170,8 @@
     const signedProtocol = 'https';
     const signedversion = '2020-02-10';
 
-    const StringToSign =
-        accountName+ '\n' +
+    const stringToSign =
+        accountName + '\n' +
         signedpermissions + '\n' +
         signedservice + '\n' +
         signedresourcetype + '\n' +
@@ -181,10 +181,10 @@
         signedProtocol + '\n' +
         signedversion + '\n';
 
-    var str =CryptoJS.HmacSHA256(StringToSign,CryptoJS.enc.Base64.parse(key));
-    var sig = CryptoJS.enc.Base64.stringify(str);
+    const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(key));
+    const sig = CryptoJS.enc.Base64.stringify(signedString);
 
-    const sasToken =`sv=${(signedversion)}&ss=${(signedservice)}&srt=${(signedresourcetype)}&sp=${(signedpermissions)}&se=${encodeURIComponent(signedexpiry)}&spr=${(signedProtocol)}&sig=${encodeURIComponent(sig)}`;
+    const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
 
      const urlToModifyStart = "https://potreefiles.blob.core.windows.net/";
      const urlToModifyEnd = "?".concat(sasToken);
