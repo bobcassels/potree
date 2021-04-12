@@ -282,45 +282,46 @@ async function getAzureSignedUrl(url, accountName, azureKey) {
   return azureSas;
 }
 
+const azureButton = document.getElementById("azure-start-button");
+azureButton.addEventListener('click', runAzureExample)
+
 
 
 async function runAzureExample() {
-      const NAME = document.getElementById("name").value;
-      const PATH = document.getElementById("path").value
-      const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
-      const CONTAINER = document.getElementById("container").value;
-      const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
-      document.getElementById("login-form").style.display = "none";
-      document.getElementById("potree-container").style.display = "initial";
-  		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+  const NAME = document.getElementById("name").value;
+  const PATH = document.getElementById("path").value
+  const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
+  const CONTAINER = document.getElementById("container").value;
+  const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("potree-container").style.display = "initial";
+	window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-  		viewer.setEDLEnabled(true);
-  		viewer.setFOV(60);
-  		viewer.setPointBudget(1_000_000);
-  		viewer.loadSettingsFromURL();
+	viewer.setEDLEnabled(true);
+	viewer.setFOV(60);
+	viewer.setPointBudget(1_000_000);
+	viewer.loadSettingsFromURL();
 
-  		viewer.setDescription("");
+	viewer.setDescription("");
 
-  		viewer.loadGUI(() => {
-  			viewer.setLanguage('en');
-  			$("#menu_appearance").next().show();
-  			//viewer.toggleSidebar();
-  		});
+	viewer.loadGUI(() => {
+		viewer.setLanguage('en');
+		$("#menu_appearance").next().show();
+		//viewer.toggleSidebar();
+	});
 
-      const signUrlAzure =
-      async (url, headers) => getAzureSignedUrl(url, ACCOUNT_NAME, AZURE_SECRET_KEY);
+  const signUrlAzure =
+  async (url, headers) => getAzureSignedUrl(url, ACCOUNT_NAME, AZURE_SECRET_KEY);
 
-      const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
-	    viewer.scene.addPointCloud(e.pointcloud);
-	    const material = e.pointcloud.material;
-	    material.size = 1;
-	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+  const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
+  viewer.scene.addPointCloud(e.pointcloud);
+  const material = e.pointcloud.material;
+  material.size = 1;
+  material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 
-	    viewer.fitToScreen();
-  }
+  viewer.fitToScreen();
+}
 
-const azureButton = document.getElementById("azure-start-button");
-azureButton.addEventListener('click', runAzureExample)
 
 
 async function runGCPExample() {
