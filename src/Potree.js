@@ -170,6 +170,7 @@ export function loadPointCloud(path, name, callback, signUrlArg) {
 		callback(e);
 	};
 
+
 	let promise = new Promise( resolve => {
 
 		// load pointcloud
