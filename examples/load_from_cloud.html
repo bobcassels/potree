@@ -18,8 +18,6 @@
 	<script src="../libs/jquery/jquery-3.1.1.min.js"></script>
 	<script src="../libs/spectrum/spectrum.js"></script>
 	<script src="../libs/jquery-ui/jquery-ui.min.js"></script>
-
-
 	<script src="../libs/other/BinaryHeap.js"></script>
 	<script src="../libs/tween/tween.min.js"></script>
 	<script src="../libs/d3/d3.js"></script>
@@ -31,128 +29,113 @@
 	<script src="../libs/plasio/js/laslaz.js"></script>
 
 	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
-        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.868.0.min.js"></script>
-	<!-- INCLUDE SETTINGS HERE -->
-       <script src="https://apis.google.com/js/client.js"></script>
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.868.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
 
-       <!-- <script src="../bundle.js" bucket="potree-files" file="lion_takanawa/cloud.js"></script> -->
+	<!-- GET INFO FROM USER -->
+  <div id="login-form">
+    <label for="name">Name</label>
+    <input type="text" size=20
+           value="lion"
+           name="name" id="name" required>
+    <br/>
+    <label for="path">Path</label>
+    <input type="text" size=40
+           value="lion_takanawa/cloud.js"
+           name="path" id="path" required>
+    <br/><br/><br/>
 
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.20/jsrsasign-all-min.js"></script>
+    <b>AWS S3</b>
+    <br/>
+    <label for="region">Region</label>
+    <input type="text" size=20
+           placeholder="REGION"
+           name="region" id="aws_region" required>
+    <br/>
+    <label for="bucket">Bucket</label>
+    <input type="text" size=40
+           placeholder="BUCKET"
+           name="bucket" id="aws_bucket" required>
+    <br/>
+    <label for="folder">Folder</label>
+    <input type="text" size=40
+           placeholder="FOLDER"
+           name="folder" id="aws_folder" required>
+    <br/>
+    <label for="uname">AWS Access Key ID</label>
+    <input type="text" size=20
+           placeholder="AWS_ACCESS_KEY_ID"
+           name="uname" id="aws_key" required>
+    <br/>
+    <label for="psw">AWS Secret Access Key</label>
+    <input type="password" size=40
+           placeholder="AWS_SECRET_ACCESS_KEY" name="psw" id="aws_secret" required>
+           <a href="https://aws.amazon.com/blogs/security/wheres-my-secret-access-key/" style="color: gray"> What's this?</a>
+    <br/>
+    <button type="submit" id="aws-start-button">Start</button>
+    </div>
 
-        <div id="login-form">
-          <label for="name">Name</label>
-          <input type="text" size=20
-                 value="lion"
-                 name="name" id="name" required>
-          <br/>
-          <label for="path">Path</label>
-          <input type="text" size=40
-                 value="lion_takanawa_v2/metadata.json"
-                 name="path" id="path" required>
-          <br/><br/>
-          <b>AWS S3</b>
-          <br/>
-          <label for="region">Region</label>
-          <input type="text" size=20
-                 placeholder="REGION"
-                 name="region" id="region" required>
-          <br/>
-          <label for="bucket">Bucket</label>
-          <input type="text" size=40
-                 placeholder="BUCKET"
-                 name="bucket" id="bucket" required>
-          <br/>
-          <label for="folder">Folder</label>
-          <input type="text" size=40
-                 placeholder="FOLDER"
-                 name="folder" id="folder" required>
-          <br/>
-          <label for="uname">AWS Access Key ID</label>
-          <input type="text" size=20
-                 placeholder="AWS_ACCESS_KEY_ID"
-                 name="uname" id="key" required>
-          <br/>
-          <label for="psw">AWS Secret Access Key</label>
-          <input type="password" size=40
-                 placeholder="AWS_SECRET_ACCESS_KEY" name="psw" id="secret" required>
-          <br/>
-          <button type="submit" id="aws-start-button">Start</button>
-        </div>
+    <br/><br/>
+    <b>Microsoft Azure</b>
+    <br/>
+    <label for="azure_account_name">Account Name</label>
+    <input type="text" size=20
+           placeholder="ACCOUNT_NAME"
+           name="azure_account_name" id="azure_account_name" required>
+    <br/>
+    <label for="container">Container</label>
+    <input type="text" size=20
+           placeholder="CONTAINER"
+           name="container" id="azure_container" required>
+    <br/>
+    <label for="azure_secret_key">Azure Secret Key</label>
+    <input type="password" size=40
+           placeholder="AZURE_SECRET_KEY"
+           name="azure_secret_key" id="azure_secret" required>
+           <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal" style="color: gray">  What's this?</a>
+    <br/>
+    <button type="submit" id="azure-start-button">Start</button>
+    </div>
 
-        <br/><br/>
-          <b>Microsoft Azure</b>
-          <br/>
-          <label for="account_name">Account Name</label>
-          <input type="text" size=20
-                 placeholder="ACCOUNT_NAME"
-                 name="azure_account_name" id="azure_account_name" required>
-          <br/>
-          <label for="container">Container</label>
-          <input type="text" size=20
-                 placeholder="CONTAINER"
-                 name="container" id="container" required>
-          <br/>
-          <label for="azure_secret_key">Azure Secret Key</label>
-          <input type="password" size=40
-                 placeholder="AZURE_SECRET_KEY"
-                 name="azure_secret_key" id="azure_secret" required>
-          <br/>
-          <button type="submit" id="azure-start-button">Start</button>
-        </div>
+    <br/><br/><br/>
+    <b>Google Cloud Platform</b>
+    <br/>
+    <label for="gcp_bucket">Bucket</label>
+    <input type="text" size=20
+           placeholder="BUCKET"
+           name="gcp_bucket" id="gcp_bucket" required>
+    <br/>
 
-        <br/><br/>
-          <b>Google Cloud Platform</b>
-          <br/>
-          <label for="client_email">Client Email</label>
-          <input type="text" size=20
-                 placeholder="CLIENT_EMAIL"
-                 name="gcp_client_email" id="gcp_client_email" required>
-          <br/>
-          <label for="gcp_bucket">Bucket</label>
-          <input type="text" size=20
-                 placeholder="BUCKET"
-                 name="gcp_bucket" id="gcp_bucket" required>
-          <br/>
-          <label for="gcp_private_key">GCP Private Key</label>
-          <input type="password" size=40
-                 placeholder="GCP_PRIVATE_KEY"
-                 name="gcp_private_key" id="gcp_private_key" required>
-          <br/>
-          <label for="choose_key_file">Key File</label>
-          <input type="file" size=40
-                 placeholder="KEY_FILE"
-                 name="key_file" id="key_file" required>
-          <br/>
+    <label for="key_file">JSON Key File</label>
+    <input type="file" size=40
+           placeholder="KEY_FILE"
+           name="key_file" id="gcp_key_file" required>
+           <a href="https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-console" style="color: gray"> What's this?</a>
+    <br/>
 
+    <button type="submit" id="gcp-start-button">Start</button>
+    </div>
+    <br/>
+    Note: A CORS policy with the following response header must accompany this request (for potree 2.0):
+    "responseHeader": ["Range"]
 
-       <!--    <input type="file" name="inputfile"
-          id="inputfile" required> -->
+    <div id="potree-container" class="potree_container" style="display: none; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
+  	<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
+  	<div id="potree_sidebar_container"> </div>
+  </div>
 
 
-
-          <button type="submit" id="gcp-start-button">Start</button>
-        </div>
-
-        <div id="potree-container" class="potree_container" style="display: none; position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
-		<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
-		<div id="potree_sidebar_container"> </div>
-	</div>
-
-
-	<script type="module">
-
+  <script type="module">
 
   // AWS
   async function runAWSExample() {
         const NAME = document.getElementById("name").value;
         const PATH = document.getElementById("path").value;
-        const REGION = document.getElementById("region").value;
-        const BUCKET = document.getElementById("bucket").value;
-        const FOLDER = document.getElementById("folder").value;
-        const AWS_ACCESS_KEY_ID = document.getElementById("key").value;
-        const AWS_SECRET_ACCESS_KEY = document.getElementById("secret").value;
+        const REGION = document.getElementById("aws_region").value;
+        const BUCKET = document.getElementById("aws_bucket").value;
+        const FOLDER = document.getElementById("aws_folder").value;
+        const AWS_ACCESS_KEY_ID = document.getElementById("aws_key").value;
+        const AWS_SECRET_ACCESS_KEY = document.getElementById("aws_secret").value;
         document.getElementById("login-form").style.display = "none";
         document.getElementById("potree-container").style.display = "initial";
     		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
@@ -199,162 +182,69 @@
     awsButton.addEventListener('click', runAWSExample);
 
 
+  // Microsoft Azure
+  async function getAzureSignedUrl(url, accountName, azureKey) {
+    const start = new Date().getTime();
+    const end = new Date(new Date().getTime() + (1000 * 43200)); // accessible for 12 hours
+    const signedpermissions = 'rl';
+    const signedservice = 'b';
+    const signedresourcetype = 'sco';
+    const signedexpiry = end.toISOString().substring(0, end.toISOString().lastIndexOf('.')) + 'Z';
+    const signedProtocol = 'https';
+    const signedversion = '2020-02-10';
 
-// these functions are in attempt to use subtlecrypto
-function str2ab(str) {
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i < strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
+    const stringToSign =
+        accountName + '\n' +
+        signedpermissions + '\n' +
+        signedservice + '\n' +
+        signedresourcetype + '\n' +
+         '\n' +
+        signedexpiry + '\n' +
+         '\n' +
+        signedProtocol + '\n' +
+        signedversion + '\n';
+
+    // sha 256 encoding
+    const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(azureKey));
+    const sig = CryptoJS.enc.Base64.stringify(signedString);
+    const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
+    const urlToModifyStart = `${signedProtocol}://${accountName}.blob.core.windows.net/`;
+    const urlToModifyEnd = "?".concat(sasToken);
+    const pathToAdd = url;
+    const azureSas = urlToModifyStart.concat(pathToAdd).concat(urlToModifyEnd);
+
+    return azureSas;
   }
-  return buf;
-}
-
-async function generateKey(azureKey) {
-
-  const cryptoKey = window.crypto.subtle.importKey(
-    "raw", //can be "jwk" or "raw"
-    str2ab(btoa(azureKey)),
-    {   //this is the algorithm options
-        name: "HMAC",
-        hash: {name: "SHA-256"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-        //length: 256, //optional, if you want your key length to differ from the hash function's block length
-    },
-    false, //whether the key is extractable (i.e. can be used in exportKey)
-    ["sign", "verify"] //can be any combination of "sign" and "verify"
-  );
-  return cryptoKey;
-}
 
 
-async function getKey(azureKey) {
-  const key = await generateKey(azureKey);
-  return key;
-}
+  async function runAzureExample() {
+    // retrieve data from form
+    const NAME = document.getElementById("name").value;
+    const PATH = document.getElementById("path").value
+    const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
+    const CONTAINER = document.getElementById("azure_container").value;
+    const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("potree-container").style.display = "initial";
+  	window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-async function getSig(algorithm, key, data) {
-  const signature = crypto.subtle.sign(algorithm, key, data);
-  return signature;
-}
+  	viewer.setEDLEnabled(true);
+  	viewer.setFOV(60);
+  	viewer.setPointBudget(1_000_000);
+  	viewer.loadSettingsFromURL();
 
+  	viewer.setDescription("");
 
+  	viewer.loadGUI(() => {
+  		viewer.setLanguage('en');
+  		$("#menu_appearance").next().show();
+  		//viewer.toggleSidebar();
+  	});
 
-// Microsoft Azure
-async function getAzureSignedUrl(url, accountName, azureKey) {
-  const start = new Date().getTime();
-  const end = new Date(new Date().getTime() + (1000 * 43200)); // accessible for 12 hours
-  const signedpermissions = 'rl';
-  const signedservice = 'b';
-  const signedresourcetype = 'sco';
-  const signedexpiry = end.toISOString().substring(0, end.toISOString().lastIndexOf('.')) + 'Z';
-  const signedProtocol = 'https';
-  const signedversion = '2020-02-10';
+    const signUrlAzure =
+    async (url) => getAzureSignedUrl(url, ACCOUNT_NAME, AZURE_SECRET_KEY);
 
-  const stringToSign =
-      accountName + '\n' +
-      signedpermissions + '\n' +
-      signedservice + '\n' +
-      signedresourcetype + '\n' +
-       '\n' +
-      signedexpiry + '\n' +
-       '\n' +
-      signedProtocol + '\n' +
-      signedversion + '\n';
-
-
-  // this is an attempt to use subtoCrypto lib
-  const secretKey = await getKey(azureKey);
-  const algorithm = "HMAC";
-  const key = secretKey;
-  const data = new ArrayBuffer(btoa(stringToSign));
-  const signature = await getSig(algorithm, key, data);
-  const base64String = btoa(String.fromCharCode(...new Uint8Array(signature)));
-
-  // sha 256 encoding
-  const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(azureKey));
-  const sig = CryptoJS.enc.Base64.stringify(signedString);
-  const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
-  const urlToModifyStart = `${signedProtocol}://${accountName}.blob.core.windows.net/`;
-  const urlToModifyEnd = "?".concat(sasToken);
-  const pathToAdd = url;
-  const azureSas = urlToModifyStart.concat(pathToAdd).concat(urlToModifyEnd);
-
-  return azureSas;
-}
-
-const azureButton = document.getElementById("azure-start-button");
-azureButton.addEventListener('click', runAzureExample)
-
-
-
-async function runAzureExample() {
-  const NAME = document.getElementById("name").value;
-  const PATH = document.getElementById("path").value
-  const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
-  const CONTAINER = document.getElementById("container").value;
-  const AZURE_SECRET_KEY = document.getElementById("azure_secret").value;
-  document.getElementById("login-form").style.display = "none";
-  document.getElementById("potree-container").style.display = "initial";
-	window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-
-	viewer.setEDLEnabled(true);
-	viewer.setFOV(60);
-	viewer.setPointBudget(1_000_000);
-	viewer.loadSettingsFromURL();
-
-	viewer.setDescription("");
-
-	viewer.loadGUI(() => {
-		viewer.setLanguage('en');
-		$("#menu_appearance").next().show();
-		//viewer.toggleSidebar();
-	});
-
-  const signUrlAzure =
-  async (url, headers) => getAzureSignedUrl(url, ACCOUNT_NAME, AZURE_SECRET_KEY);
-
-  const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
-  viewer.scene.addPointCloud(e.pointcloud);
-  const material = e.pointcloud.material;
-  material.size = 1;
-  material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-
-  viewer.fitToScreen();
-}
-
-
-
-async function runGCPExample() {
-  const BUCKET = document.getElementById("gcp_bucket").value;
-  const NAME = document.getElementById("name").value;
-  const PATH = document.getElementById("path").value;
-  const CLIENT_EMAIL = document.getElementById("gcp_client_email").value;
-  const PRIVATE_KEY = document.getElementById("gcp_private_key").value;
-  const KEY_FILE = document.getElementById("key_file").files[0];
-  document.getElementById("login-form").style.display = "none";
-  document.getElementById("potree-container").style.display = "initial";
-	window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-
-	viewer.setEDLEnabled(true);
-	viewer.setFOV(60);
-	viewer.setPointBudget(1_000_000);
-	viewer.loadSettingsFromURL();
-
-	viewer.setDescription("");
-
-	viewer.loadGUI(() => {
-		viewer.setLanguage('en');
-		$("#menu_appearance").next().show();
-		//viewer.toggleSidebar();
-	});
-
-  var fr = new FileReader();
-  fr.onload = async function() {
-    const result = fr.result;
-    const signUrlGCP =
-    async (url, headers) => getGCPSignedUrl(url, headers, result, BUCKET);
-
-    const e = await Potree.loadPointCloud(BUCKET + "/" + PATH, NAME, null, signUrlGCP);
+    const e = await Potree.loadPointCloud(CONTAINER + "/" + PATH, NAME, null, signUrlAzure);
     viewer.scene.addPointCloud(e.pointcloud);
     const material = e.pointcloud.material;
     material.size = 1;
@@ -363,103 +253,144 @@ async function runGCPExample() {
     viewer.fitToScreen();
   }
 
-  fr.readAsText(KEY_FILE);
-
-}
-
-const gcpButton = document.getElementById("gcp-start-button");
-gcpButton.addEventListener('click', runGCPExample)
+  const azureButton = document.getElementById("azure-start-button");
+  azureButton.addEventListener('click', runAzureExample);
 
 
 
+  // Google Cloud Platform
 
-function sha256Encode(arrBuff) {
+  function sha256Encode(arrBuff) {
   return crypto.subtle.digest("SHA-256", arrBuff);
 }
+  // function source: https://stackoverflow.com/questions/40031688/javascript-arraybuffer-to-hex
+  function buf2hex(buffer) { // buffer is an ArrayBuffer
+    return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+  }
 
-function buf2hex(buffer) { // buffer is an ArrayBuffer
-  return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
-}
+  // sha-256 hash and hex encode the canonical request
+  async function encodeCanonical(request) {
+    var enc = new TextEncoder(); // always utf-8
+    const encodedBufferArray = enc.encode(request);
+    const encodedCanonicalArrBuff = await sha256Encode(encodedBufferArray);
+    const encodedCanonicalHex = buf2hex(encodedCanonicalArrBuff);
 
-// sha-256 hash and hex encode the canonical request
-async function encodeCanonical(request) {
-  var enc = new TextEncoder(); // always utf-8
-  const encodedBufferArray = enc.encode(request);
-  const encodedCanonicalArrBuff = await sha256Encode(encodedBufferArray);
-  const encodedCanonicalHex = buf2hex(encodedCanonicalArrBuff);
+    return encodedCanonicalHex;
+  }
 
-  return encodedCanonicalHex;
-}
+  async function getGCPSignedUrl(url, headers, privateKeyFile, bucket) {
 
+    // extract the private key from the given file
+    const keyHeader = '"private_key": ';
+    const keyFooter = '\\n",';
+    const keyStart = privateKeyFile.indexOf(keyHeader) + keyHeader.length;
+    const keyEnd = privateKeyFile.indexOf(keyFooter);
+    const privateKey = privateKeyFile.substring(keyStart, keyEnd).replaceAll("\\n", "\n");
 
-async function getGCPSignedUrl(url, headers, privateKeyFile, bucket) {
+    // extract the client email from the given file
+    const emailHeader = '"client_email": "';
+    const emailFooter = '"client_id"';
+    const emailEndingToClip = '",';
+    const emailStart = privateKeyFile.indexOf(emailHeader) + emailHeader.length;
+    const emailEnd = privateKeyFile.indexOf(emailFooter);
+    const clientEmailNotClipped = privateKeyFile.substring(emailStart, emailEnd);
+    const emailClippedEnd = clientEmailNotClipped.indexOf(emailEndingToClip);
+    const clientEmail = clientEmailNotClipped.trim().substring(0, emailClippedEnd).replace("@", "%40");
 
-  // extract the private key from the given file.
-  const keyHeader = '"private_key": ';
-  const keyFooter = '\\n",';
-  const keyStart = privateKeyFile.indexOf(keyHeader) + keyHeader.length;
-  const keyEnd = privateKeyFile.indexOf(keyFooter);
-  const privateKey = privateKeyFile.substring(keyStart, keyEnd).replaceAll("\\n", "\n");
+    // path to file without bucket name
+    const pathAfterBucket = url.substring(bucket.length, url.length);
 
-  // extract the client email from the given file.
-  const emailHeader = '"client_email": "';
-  const emailFooter = '"client_id"';
-  const emailEndingToClip = '",';
-  const emailStart = privateKeyFile.indexOf(emailHeader) + emailHeader.length;
-  const emailEnd = privateKeyFile.indexOf(emailFooter);
-  const clientEmailNotClipped = privateKeyFile.substring(emailStart, emailEnd);
-  const emailClippedEnd = clientEmailNotClipped.indexOf(emailEndingToClip);
-  const clientEmail = clientEmailNotClipped.trim().substring(0, emailClippedEnd).replace("@", "%40");
+    // consts used in query
+    const algorithm = "GOOG4-RSA-SHA256";
+    const date = new Date();
+    const dateISO = date.toISOString();
+    const dateWithSeconds = dateISO.substring(0, dateISO.lastIndexOf('.')) + 'Z';
+    const dateWithSecondsFormatted = dateWithSeconds.replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
+    const dateDay = dateISO.substring(0, dateISO.indexOf("T")).replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
+    const expiration = 43200; // accessible for 12 hours
 
-  // path to file without bucket name
-  const pathAfterBucket = url.substring(bucket.length, url.length);
+    const canonicalQueryString =
+    'X-Goog-Algorithm=' + algorithm +
+    '&X-Goog-Credential=' + clientEmail +
+    '%2F' + dateDay + '%2Fauto%2Fstorage%2Fgoog4_request' +
+    '&X-Goog-Date=' + dateWithSecondsFormatted +
+    '&X-Goog-Expires=' + expiration.toString() +
+    '&X-Goog-SignedHeaders=host' +
+    (!headers? "" : '%3Brange');
 
-  // consts used in query
-  const algorithm = "GOOG4-RSA-SHA256";
+    const canonicalRequest =
+    'GET\n' +
+    pathAfterBucket + '\n' +
+    canonicalQueryString + '\n' +
+    'host:potree-files.storage.googleapis.com\n' +
+    (!headers? '\n' : 'range:' + headers.Range + '\n\n') +
+    (!headers? 'host' : 'host;range') + '\n' +
+    'UNSIGNED-PAYLOAD';
 
-  const date = new Date();
-  const dateISO = date.toISOString();
+    const encodedCanonical = await encodeCanonical(canonicalRequest);
 
-  const dateWithSeconds = dateISO.substring(0, dateISO.lastIndexOf('.')) + 'Z';
-  const dateWithSecondsFormatted = dateWithSeconds.replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
-  const dateDay = dateISO.substring(0, dateISO.indexOf("T")).replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
-  const expiration = 43200; // accessible for 12 hours
+    const stringToSign = algorithm + '\n' + dateWithSecondsFormatted + '\n' + dateDay + '/auto/storage/goog4_request\n'
+    + encodedCanonical;
 
-  const canonicalQueryString =
-  'X-Goog-Algorithm=' + algorithm +
-  '&X-Goog-Credential=' + clientEmail +
-  '%2F' + dateDay + '%2Fauto%2Fstorage%2Fgoog4_request' +
-  '&X-Goog-Date=' + dateWithSecondsFormatted +
-  '&X-Goog-Expires=' + expiration.toString() +
-  '&X-Goog-SignedHeaders=host' +
-  (!headers? "" : '%3Brange');
+    // RSA signature generation
+    var sig = new KJUR.crypto.Signature({"alg": "SHA256withRSA"});
+    sig.init(privateKey);
+    sig.updateString(stringToSign);
+    var signature = sig.sign();
 
-  const canonicalRequest =
-  'GET\n' +
-  pathAfterBucket + '\n' +
-  canonicalQueryString + '\n' +
-  'host:potree-files.storage.googleapis.com\n' +
-  (!headers? '\n' : 'range:' + headers.Range + '\n\n') +
-  (!headers? 'host' : 'host;range') + '\n' +
-  'UNSIGNED-PAYLOAD';
+    const signedUrl = 'https://' + bucket + '.storage.googleapis.com' + pathAfterBucket + "?" + canonicalQueryString + "&x-goog-signature=" + signature;
 
-  const encodedCanonical = await encodeCanonical(canonicalRequest);
+    return signedUrl;
 
-  const stringToSign = algorithm + '\n' + dateWithSecondsFormatted + '\n' + dateDay + '/auto/storage/goog4_request\n'
-  + encodedCanonical;
+  }
 
-  // RSA signature generation
-  var sig = new KJUR.crypto.Signature({"alg": "SHA256withRSA"});
-  sig.init(privateKey);
-  sig.updateString(stringToSign);
-  var signature = sig.sign();
+  async function runGCPExample() {
+    const BUCKET = document.getElementById("gcp_bucket").value;
+    const NAME = document.getElementById("name").value;
+    const PATH = document.getElementById("path").value;
+    const KEY_FILE = document.getElementById("gcp_key_file").files[0];
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("potree-container").style.display = "initial";
+  	window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-  const signedUrl = 'https://' + bucket + '.storage.googleapis.com' + pathAfterBucket + "?" + canonicalQueryString + "&x-goog-signature=" + signature;
+  	viewer.setEDLEnabled(true);
+  	viewer.setFOV(60);
+  	viewer.setPointBudget(1_000_000);
+  	viewer.loadSettingsFromURL();
 
-  return signedUrl;
+  	viewer.setDescription("");
 
-}
+  	viewer.loadGUI(() => {
+  		viewer.setLanguage('en');
+  		$("#menu_appearance").next().show();
+  		//viewer.toggleSidebar();
+  	});
 
+    // read in the key file given by user
+    var fr = new FileReader();
+    fr.onload = async function() {
+      const result = fr.result;
+      const signUrlGCP =
+      async (url, headers) => getGCPSignedUrl(url, headers, result, BUCKET);
+
+      const e = await Potree.loadPointCloud(BUCKET + "/" + PATH, NAME, null, signUrlGCP);
+      viewer.scene.addPointCloud(e.pointcloud);
+      const material = e.pointcloud.material;
+      material.size = 1;
+      material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+      viewer.fitToScreen();
+    }
+
+    try {
+      fr.readAsText(KEY_FILE);
+    } catch(e) {
+      throw("Given file is incompatible.");
+    }
+  }
+
+  const gcpButton = document.getElementById("gcp-start-button");
+  gcpButton.addEventListener('click', runGCPExample)
 
 
 </script>
