@@ -183,13 +183,64 @@
 
 
   // Microsoft Azure
+
+  // generate key object for signing algorithm
+  async function getAzureKey(key) {
+    const format = "raw";
+    const keyData = base64StringToArrayBuffer(key);
+    const algorithm = {
+      name: "HMAC",
+      hash: "SHA-256",
+    };
+    const extractable = true;
+    const keyUsages = ['sign','verify'];
+    const result = crypto.subtle.importKey(
+    format,
+    keyData,
+    algorithm,
+    extractable,
+    keyUsages
+    );
+    return result;
+  }
+
+  // hmac signing algorithm
+  async function hmacSHA256(key, data) {
+    const algorithm = "HMAC";
+    const keyObj = await getAzureKey(key);
+    var enc = new TextEncoder(); // always utf-8
+    const encodedBufferArray = enc.encode(data);
+    const signature = crypto.subtle.sign(algorithm, keyObj, encodedBufferArray);
+    return signature;
+  }
+
+  // from source: https://gist.github.com/deiu/2c3208c89fbc91d23226
+  function arrayBufferToBase64String(arrayBuffer) {
+      var byteArray = new Uint8Array(arrayBuffer)
+      var byteString = ''
+      for (var i=0; i<byteArray.byteLength; i++) {
+        byteString += String.fromCharCode(byteArray[i])
+      }
+      return btoa(byteString)
+    }
+
+  // from source: https://gist.github.com/deiu/2c3208c89fbc91d23226
+  function base64StringToArrayBuffer(b64str) {
+    var byteStr = atob(b64str)
+    var bytes = new Uint8Array(byteStr.length)
+    for (var i = 0; i < byteStr.length; i++) {
+      bytes[i] = byteStr.charCodeAt(i)
+    }
+    return bytes.buffer
+  }
+
+
   async function getAzureSignedUrl(url, accountName, azureKey) {
-    const start = new Date().getTime();
-    const end = new Date(new Date().getTime() + (1000 * 43200)); // accessible for 12 hours
+    const end = new Date(Date.now() + 1000 * 12 * 60 * 60); // accessible for 12 hours
     const signedpermissions = 'rl';
     const signedservice = 'b';
     const signedresourcetype = 'sco';
-    const signedexpiry = end.toISOString().substring(0, end.toISOString().lastIndexOf('.')) + 'Z';
+    const signedexpiry = end.toISOString().replace(/\.[0-9]*/, '');
     const signedProtocol = 'https';
     const signedversion = '2020-02-10';
 
@@ -205,14 +256,9 @@
         signedversion + '\n';
 
     // sha 256 encoding
-    const signedString = CryptoJS.HmacSHA256(stringToSign, CryptoJS.enc.Base64.parse(azureKey));
-    const sig = CryptoJS.enc.Base64.stringify(signedString);
-    const sasToken =`sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(sig)}`;
-    const urlToModifyStart = `${signedProtocol}://${accountName}.blob.core.windows.net/`;
-    const urlToModifyEnd = "?".concat(sasToken);
-    const pathToAdd = url;
-    const azureSas = urlToModifyStart.concat(pathToAdd).concat(urlToModifyEnd);
-
+    const signatureBuffer = await hmacSHA256(azureKey, stringToSign);
+    const signature = arrayBufferToBase64String(signatureBuffer);
+    const azureSas = `${signedProtocol}://${accountName}.blob.core.windows.net/${url}?sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(signature)}`;
     return azureSas;
   }
 
@@ -304,10 +350,12 @@
     const algorithm = "GOOG4-RSA-SHA256";
     const date = new Date();
     const dateISO = date.toISOString();
-    const dateWithSeconds = dateISO.substring(0, dateISO.lastIndexOf('.')) + 'Z';
-    const dateWithSecondsFormatted = dateWithSeconds.replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
-    const dateDay = dateISO.substring(0, dateISO.indexOf("T")).replaceAll("-", "").replaceAll(":", "").replaceAll(".", "");
-    const expiration = 43200; // accessible for 12 hours
+    const dateWithSeconds = dateISO.replace(/\.[0-9]*/, '');
+    const regexWithSeconds = /:|-/g;
+    const dateWithSecondsFormatted = dateWithSeconds.replace(regexWithSeconds, "");
+    const regexForDay = /T.*/;
+    const dateDay = dateISO.replace(regexForDay, "").replace(regexWithSeconds, "");
+    const expiration = 12 * 60 * 60; // accessible for 12 hours
 
     const canonicalQueryString =
     'X-Goog-Algorithm=' + algorithm +
@@ -328,9 +376,7 @@
     'UNSIGNED-PAYLOAD';
 
     const encodedCanonical = await encodeCanonical(canonicalRequest);
-
-    const stringToSign = algorithm + '\n' + dateWithSecondsFormatted + '\n' + dateDay + '/auto/storage/goog4_request\n'
-    + encodedCanonical;
+    const stringToSign = `${algorithm}\n${dateWithSecondsFormatted}\n${dateDay}/auto/storage/goog4_request\n${encodedCanonical}`;
 
     // RSA signature generation
     var sig = new KJUR.crypto.Signature({"alg": "SHA256withRSA"});
@@ -338,10 +384,8 @@
     sig.updateString(stringToSign);
     var signature = sig.sign();
 
-    const signedUrl = 'https://' + bucket + '.storage.googleapis.com' + pathAfterBucket + "?" + canonicalQueryString + "&x-goog-signature=" + signature;
-
+    const signedUrl = `https://${bucket}.storage.googleapis.com${pathAfterBucket}?${canonicalQueryString}&x-goog-signature=${signature}`;
     return signedUrl;
-
   }
 
   async function runGCPExample() {
