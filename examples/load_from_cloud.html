@@ -127,58 +127,59 @@
   <script type="module">
 
   // AWS
+
   async function runAWSExample() {
-        const NAME = document.getElementById("name").value;
-        const PATH = document.getElementById("path").value;
-        const REGION = document.getElementById("aws_region").value;
-        const BUCKET = document.getElementById("aws_bucket").value;
-        const FOLDER = document.getElementById("aws_folder").value;
-        const AWS_ACCESS_KEY_ID = document.getElementById("aws_key").value;
-        const AWS_SECRET_ACCESS_KEY = document.getElementById("aws_secret").value;
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("potree-container").style.display = "initial";
-    		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
+    const NAME = document.getElementById("name").value;
+    const PATH = document.getElementById("path").value;
+    const REGION = document.getElementById("aws_region").value;
+    const BUCKET = document.getElementById("aws_bucket").value;
+    const FOLDER = document.getElementById("aws_folder").value;
+    const AWS_ACCESS_KEY_ID = document.getElementById("aws_key").value;
+    const AWS_SECRET_ACCESS_KEY = document.getElementById("aws_secret").value;
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("potree-container").style.display = "initial";
+		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-    		viewer.setEDLEnabled(true);
-    		viewer.setFOV(60);
-    		viewer.setPointBudget(1_000_000);
-    		viewer.loadSettingsFromURL();
+		viewer.setEDLEnabled(true);
+		viewer.setFOV(60);
+		viewer.setPointBudget(1_000_000);
+		viewer.loadSettingsFromURL();
 
-    		viewer.setDescription("");
+		viewer.setDescription("");
 
-    		viewer.loadGUI(() => {
-    			viewer.setLanguage('en');
-    			$("#menu_appearance").next().show();
-    			//viewer.toggleSidebar();
-    		});
+		viewer.loadGUI(() => {
+			viewer.setLanguage('en');
+			$("#menu_appearance").next().show();
+			//viewer.toggleSidebar();
+		});
 
-        const s3 = new AWS.S3({
-          region: REGION,
-          accessKeyId: AWS_ACCESS_KEY_ID,
-          secretAccessKey: AWS_SECRET_ACCESS_KEY
-        });
+    const s3 = new AWS.S3({
+      region: REGION,
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY
+    });
 
-        const signUrl =
-          // For AWS JavaScript API v2, this doesn't need to be async.
-          // But v3 and other cloud APIs will need async / await.
-           async (url, headers) => s3.getSignedUrl('getObject',
-                                            {
-                                              Bucket: BUCKET,
-                                              Key: url,
-                                              ...(headers || {})
-                                            });
+    const signUrl =
+      // For AWS JavaScript API v2, this doesn't need to be async.
+      // But v3 and other cloud APIs will need async / await.
+       async (url, headers) => s3.getSignedUrl('getObject',
+                                        {
+                                          Bucket: BUCKET,
+                                          Key: url,
+                                          ...(headers || {})
+                                        });
 
-    	    const e = await Potree.loadPointCloud(FOLDER + "/" + PATH, NAME, null, signUrl);
-    	    viewer.scene.addPointCloud(e.pointcloud);
-    	    const material = e.pointcloud.material;
-    	    material.size = 1;
-    	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+	    const e = await Potree.loadPointCloud(FOLDER + "/" + PATH, NAME, null, signUrl);
+	    viewer.scene.addPointCloud(e.pointcloud);
+	    const material = e.pointcloud.material;
+	    material.size = 1;
+	    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 
-    	    viewer.fitToScreen();
-       }
+	    viewer.fitToScreen();
+   }
 
-    const awsButton = document.getElementById("aws-start-button");
-    awsButton.addEventListener('click', runAWSExample);
+  const awsButton = document.getElementById("aws-start-button");
+  awsButton.addEventListener('click', runAWSExample);
 
 
   // Microsoft Azure
@@ -202,7 +203,7 @@
     );
   }
 
-  // hmac signing algorithm
+  // hmac sha256 signing algorithm
   async function hmacSHA256(key, data) {
     const algorithm = "HMAC";
     const keyObj = await getAzureKey(key);
@@ -262,7 +263,6 @@
 
 
   async function runAzureExample() {
-    // retrieve data from form
     const NAME = document.getElementById("name").value;
     const PATH = document.getElementById("path").value
     const ACCOUNT_NAME = document.getElementById("azure_account_name").value;
@@ -351,7 +351,7 @@
   }
 
   function sha256Encode(arrBuff) {
-  return crypto.subtle.digest("SHA-256", arrBuff);
+    return crypto.subtle.digest("SHA-256", arrBuff);
   }
 
   // code snippet taken from: https://stackoverflow.com/questions/40031688/javascript-arraybuffer-to-hex
@@ -365,13 +365,10 @@
     const enc = new TextEncoder(); // always utf-8
     const encodedBufferArray = enc.encode(request);
     const encodedCanonicalArrBuff = await sha256Encode(encodedBufferArray);
-    const encodedCanonicalHex = buf2hex(encodedCanonicalArrBuff);
-
-    return encodedCanonicalHex;
+    return buf2hex(encodedCanonicalArrBuff);
   }
 
   async function getGCPSignedUrl(url, headers, privateKeyFile, bucket) {
-
     // extract the private key from the given file
     const regexKey = /"private_key": "(.*)\\n",/;
     const privateKey = privateKeyFile.match(regexKey)[1].replaceAll("\\n", "\n");
@@ -469,7 +466,7 @@
   }
 
   const gcpButton = document.getElementById("gcp-start-button");
-  gcpButton.addEventListener('click', runGCPExample)
+  gcpButton.addEventListener('click', runGCPExample);
 
 
 </script>
