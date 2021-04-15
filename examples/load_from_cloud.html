@@ -193,14 +193,13 @@
     };
     const extractable = true;
     const keyUsages = ['sign'];
-    const result = crypto.subtle.importKey(
+    return crypto.subtle.importKey(
     format,
     keyData,
     algorithm,
     extractable,
     keyUsages
     );
-    return result;
   }
 
   // hmac signing algorithm
@@ -255,9 +254,9 @@
         signedversion + '\n';
 
     // sha 256 encoding
-    const signedDataBuffer = await hmacSHA256(azureKey, stringToSign);
-    const signedData = arrayBufferToBase64String(signedDataBuffer);
-    const azureSas = `${signedProtocol}://${accountName}.blob.core.windows.net/${url}?sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(signedData)}`;
+    const signatureBuffer = await hmacSHA256(azureKey, stringToSign);
+    const signature = arrayBufferToBase64String(signatureBuffer);
+    const azureSas = `${signedProtocol}://${accountName}.blob.core.windows.net/${url}?sv=${signedversion}&ss=${signedservice}&srt=${signedresourcetype}&sp=${signedpermissions}&se=${encodeURIComponent(signedexpiry)}&spr=${signedProtocol}&sig=${encodeURIComponent(signature)}`;
     return azureSas;
   }
 
@@ -374,21 +373,12 @@
   async function getGCPSignedUrl(url, headers, privateKeyFile, bucket) {
 
     // extract the private key from the given file
-    const keyHeader = '"private_key": "';
-    const keyFooter = '\\n",';
-    const keyStart = privateKeyFile.indexOf(keyHeader) + keyHeader.length;
-    const keyEnd = privateKeyFile.indexOf(keyFooter);
-    const privateKey = privateKeyFile.substring(keyStart, keyEnd).replaceAll("\\n", "\n");
+    const regexKey = /"private_key": "(.*)\\n",/;
+    const privateKey = privateKeyFile.match(regexKey)[1].replaceAll("\\n", "\n");
 
     // extract the client email from the given file
-    const emailHeader = '"client_email": "';
-    const emailFooter = '"client_id"';
-    const emailEndingToClip = '",';
-    const emailStart = privateKeyFile.indexOf(emailHeader) + emailHeader.length;
-    const emailEnd = privateKeyFile.indexOf(emailFooter);
-    const clientEmailNotClipped = privateKeyFile.substring(emailStart, emailEnd);
-    const emailClippedEnd = clientEmailNotClipped.indexOf(emailEndingToClip);
-    const clientEmail = clientEmailNotClipped.trim().substring(0, emailClippedEnd).replace("@", "%40");
+    const regexEmail = /"client_email": "(.*)",/;
+    const clientEmail = privateKeyFile.match(regexEmail)[1];
 
     // path to file without bucket name
     const pathAfterBucket = url.substring(bucket.length, url.length);
@@ -406,7 +396,7 @@
 
     const canonicalQueryString =
     'X-Goog-Algorithm=' + algorithm +
-    '&X-Goog-Credential=' + clientEmail +
+    '&X-Goog-Credential=' + encodeURIComponent(clientEmail) +
     '%2F' + dateDay + '%2Fauto%2Fstorage%2Fgoog4_request' +
     '&X-Goog-Date=' + dateWithSecondsFormatted +
     '&X-Goog-Expires=' + expiration.toString() +
@@ -426,10 +416,10 @@
     const stringToSign = `${algorithm}\n${dateWithSecondsFormatted}\n${dateDay}/auto/storage/goog4_request\n${encodedCanonical}`;
 
     // RSA signature generation
-    const signedStringBuffer = await rsaSha256(privateKey, stringToSign);
-    const signedString = buf2hex(signedStringBuffer);
+    const signatureBuffer = await rsaSha256(privateKey, stringToSign);
+    const signature = buf2hex(signatureBuffer);
 
-    const signedUrl = `https://${bucket}.storage.googleapis.com${pathAfterBucket}?${canonicalQueryString}&x-goog-signature=${signedString}`;
+    const signedUrl = `https://${bucket}.storage.googleapis.com${pathAfterBucket}?${canonicalQueryString}&x-goog-signature=${signature}`;
     return signedUrl;
   }
 
