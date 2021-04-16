@@ -7,9 +7,8 @@ import {OctreeGeometry, OctreeGeometryNode} from "./OctreeGeometry.js";
 
 export class NodeLoader{
 
-        constructor(url, signUrl){
-                this.url = url;
-                this.signUrl = signUrl;
+	constructor(url){
+		this.url = url;
 	}
 
 	async load(node){
@@ -36,8 +35,7 @@ export class NodeLoader{
 			let {byteOffset, byteSize} = node;
 
 
-                        const lastSlash = this.url.lastIndexOf('/');
-			const urlOctree = `${this.url.substring(0, lastSlash + 1)}octree.bin`;
+			let urlOctree = `${this.url}/../octree.bin`;
 
 			let first = byteOffset;
 			let last = byteOffset + byteSize - 1n;
@@ -48,9 +46,13 @@ export class NodeLoader{
 				buffer = new ArrayBuffer(0);
 				console.warn(`loaded node with 0 bytes: ${node.name}`);
 			}else{
-                    const headers = {Range: `bytes=${first}-${last}`};
-			        const response = await fetch(await this.signUrl(urlOctree, headers),
-                                                             {headers})
+				let response = await fetch(urlOctree, {
+					headers: {
+						'content-type': 'multipart/byteranges',
+						'Range': `bytes=${first}-${last}`,
+					},
+				});
+
 				buffer = await response.arrayBuffer();
 			}
 
@@ -71,7 +73,7 @@ export class NodeLoader{
 				Potree.workerPool.returnWorker(workerPath, worker);
 
 				let geometry = new THREE.BufferGeometry();
-
+				
 				for(let property in buffers){
 
 					let buffer = buffers[property].buffer;
@@ -185,12 +187,12 @@ export class NodeLoader{
 				current.hierarchyByteSize = byteSize;
 				current.numPoints = numPoints;
 			}else{
-				// load real node
+				// load real node 
 				current.byteOffset = byteOffset;
 				current.byteSize = byteSize;
 				current.numPoints = numPoints;
 			}
-
+			
 			current.nodeType = type;
 
 			if(current.nodeType === 2){
@@ -236,14 +238,20 @@ export class NodeLoader{
 	async loadHierarchy(node){
 
 		let {hierarchyByteOffset, hierarchyByteSize} = node;
-                const lastSlash = this.url.lastIndexOf('/');
-		const hierarchyPath = `${this.url.substring(0, lastSlash + 1)}hierarchy.bin`;
+		let hierarchyPath = `${this.url}/../hierarchy.bin`;
+		
 		let first = hierarchyByteOffset;
 		let last = first + hierarchyByteSize - 1n;
 
-                const headers = {Range: `bytes=${first}-${last}`};
-                const response = await fetch(await this.signUrl(hierarchyPath, headers),
-                                             {headers})
+		let response = await fetch(hierarchyPath, {
+			headers: {
+				'content-type': 'multipart/byteranges',
+				'Range': `bytes=${first}-${last}`,
+			},
+		});
+
+
+
 		let buffer = await response.arrayBuffer();
 
 		this.parseHierarchy(node, buffer);
@@ -260,13 +268,13 @@ export class NodeLoader{
 		// 			requestAnimationFrame(repeatUntilDone);
 		// 		}
 		// 	};
-
+			
 		// 	repeatUntilDone();
 		// });
 
 		// await promise;
 
-
+		
 
 
 
@@ -291,7 +299,7 @@ function createChildAABB(aabb, index){
 	} else {
 		max.y -= size.y / 2;
 	}
-
+	
 	if ((index & 0b0100) > 0) {
 		min.x += size.x / 2;
 	} else {
@@ -352,7 +360,7 @@ export class OctreeLoader{
 
 		{
 			// check if it has normals
-			let hasNormals =
+			let hasNormals = 
 				attributes.attributes.find(a => a.name === "NormalX") !== undefined &&
 				attributes.attributes.find(a => a.name === "NormalY") !== undefined &&
 				attributes.attributes.find(a => a.name === "NormalZ") !== undefined;
@@ -369,20 +377,14 @@ export class OctreeLoader{
 		return attributes;
 	}
 
-        static async load(url, signUrl){
-                const response = await fetch(await signUrl(url));
-                if (!response.ok) {
-                    // AWS "file not found" with signed URL returns 403
-                    if ([403, 404].includes(response.status)) {
-                            return {};
-                    }
-                    throw new Error(`Fetch error type: ${response.type}, status: ${response.status} ${response.statusText}`);
-                }
+	static async load(url){
+
+		let response = await fetch(url);
 		let metadata = await response.json();
 
 		let attributes = OctreeLoader.parseAttributes(metadata.attributes);
 
-                let loader = new NodeLoader(url, signUrl);
+		let loader = new NodeLoader(url);
 		loader.metadata = metadata;
 		loader.attributes = attributes;
 		loader.scale = metadata.scale;
@@ -430,7 +432,8 @@ export class OctreeLoader{
 			geometry: octree,
 		};
 
-	        return result;
+		return result;
+
 	}
 
 };
